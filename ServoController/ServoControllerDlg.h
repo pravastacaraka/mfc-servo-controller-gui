@@ -50,4 +50,9 @@ public:
 	afx_msg void OnNMCustomdrawSliderAngle_S0(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMCustomdrawSliderAngle_S2(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMCustomdrawSliderAngle_S3(NMHDR *pNMHDR, LRESULT *pResult);
+
+	int m_a1, m_a2;
+	int m_px, m_py;
+
+	afx_msg void ForwardKinematics();
 };

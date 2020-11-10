@@ -3,6 +3,7 @@
 #include "ServoController.h"
 #include "ServoControllerDlg.h"
 #include "afxdialogex.h"
+#include "math.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -25,6 +26,10 @@ CServoControllerDlg::CServoControllerDlg(CWnd* pParent /*=nullptr*/)
 	, m_y1_s3(2416)
 	, m_y2_s3(626)
 	, m_interpolation_s3(0)
+	, m_a1(0)
+	, m_a2(0)
+	, m_px(0)
+	, m_py(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -45,6 +50,10 @@ void CServoControllerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_ECY1_S3, m_y1_s3);
 	DDX_Text(pDX, IDC_ECY2_S3, m_y2_s3);
 	DDX_Text(pDX, IDC_ECINTERPOLATION_S3, m_interpolation_s3);
+	DDX_Text(pDX, IDC_ECA1, m_a1);
+	DDX_Text(pDX, IDC_ECA2, m_a2);
+	DDX_Text(pDX, IDC_ECPX, m_px);
+	DDX_Text(pDX, IDC_ECPY, m_py);
 	DDX_Control(pDX, IDC_SLANGLE_S0, m_slider0);
 	DDX_Control(pDX, IDC_SLANGLE_S2, m_slider2);
 	DDX_Control(pDX, IDC_SLANGLE_S3, m_slider3);
@@ -258,12 +267,13 @@ void CServoControllerDlg::OnNMCustomdrawSliderAngle_S0(NMHDR *pNMHDR, LRESULT *p
 		m_comm.put_Output(COleVariant(hexdata));
 		m_comm.put_Output(COleVariant(tail));
 
+		ForwardKinematics();
+
 		UpdateData(FALSE);
 	}
 
 	*pResult = 0;
 }
-
 
 void CServoControllerDlg::OnNMCustomdrawSliderAngle_S2(NMHDR *pNMHDR, LRESULT *pResult)
 {
@@ -316,12 +326,13 @@ void CServoControllerDlg::OnNMCustomdrawSliderAngle_S2(NMHDR *pNMHDR, LRESULT *p
 		m_comm.put_Output(COleVariant(hexdata));
 		m_comm.put_Output(COleVariant(tail));
 
+		ForwardKinematics();
+
 		UpdateData(FALSE);
 	}
 
 	*pResult = 0;
 }
-
 
 void CServoControllerDlg::OnNMCustomdrawSliderAngle_S3(NMHDR *pNMHDR, LRESULT *pResult)
 {
@@ -378,4 +389,17 @@ void CServoControllerDlg::OnNMCustomdrawSliderAngle_S3(NMHDR *pNMHDR, LRESULT *p
 	}
 
 	*pResult = 0;
+}
+
+void CServoControllerDlg::ForwardKinematics()
+{
+	static int teta2 = 0;
+
+	UpdateData(TRUE);
+
+	teta2 = m_angle_s0 + (m_angle_s2 - 90); // normalisasi
+	m_px = round(m_a1 * cos((float)(m_angle_s0)*3.14 / 180) + m_a2 * cos((float)(teta2)*3.14 / 180));
+	m_py = round(m_a1 * sin((float)(m_angle_s0)*3.14 / 180) + m_a2 * sin((float)(teta2)*3.14 / 180));
+	
+	UpdateData(FALSE);
 }
