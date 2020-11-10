@@ -32,8 +32,10 @@ CServoControllerDlg::CServoControllerDlg(CWnd* pParent /*=nullptr*/)
 	, m_interpolation_s3(0)
 	, m_a1(0)
 	, m_a2(0)
+	, m_a3(0)
 	, m_px(0)
 	, m_py(0)
+	, m_orientation(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -60,8 +62,10 @@ void CServoControllerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_ECINTERPOLATION_S3, m_interpolation_s3);
 	DDX_Text(pDX, IDC_ECA1, m_a1);
 	DDX_Text(pDX, IDC_ECA2, m_a2);
+	DDX_Text(pDX, IDC_ECA3, m_a3);
 	DDX_Text(pDX, IDC_ECPX, m_px);
 	DDX_Text(pDX, IDC_ECPY, m_py);
+	DDX_Text(pDX, IDC_ECORIENTATION, m_orientation);
 	DDX_Control(pDX, IDC_SLANGLE_S0, m_slider0);
 	DDX_Control(pDX, IDC_SLANGLE_S1, m_slider1);
 	DDX_Control(pDX, IDC_SLANGLE_S2, m_slider2);
@@ -477,13 +481,31 @@ void CServoControllerDlg::OnNMCustomdrawSliderAngle_S3(NMHDR *pNMHDR, LRESULT *p
 
 void CServoControllerDlg::ForwardKinematics()
 {
-	static int teta2 = 0;
+	// Kinematika 2 DoF
+	/*static int teta2 = 0, teta3 = 0;
 
 	UpdateData(TRUE);
 
-	teta2 = m_angle_s1 + (m_angle_s2 - 90); // normalisasi
+	teta2 = m_angle_s0 + m_angle_s2;	// normalisasi
 	m_px = round(m_a1 * cos((float)(m_angle_s0)*3.14 / 180) + m_a2 * cos((float)(teta2)*3.14 / 180));
 	m_py = round(m_a1 * sin((float)(m_angle_s0)*3.14 / 180) + m_a2 * sin((float)(teta2)*3.14 / 180));
+
+	UpdateData(FALSE);*/
+
+	// Kinematika 3 DoF
+	static int teta2 = 0, teta3 = 0;
+
+	UpdateData(TRUE);
+
+	teta2 = m_angle_s0 + m_angle_s2;	// normalisasi
+	teta3 = teta2 + m_angle_s3;			// normalisasi
+
+	m_px = round(m_a1 * cos((float)(m_angle_s0)*3.14 / 180) + m_a2 * cos((float)(teta2)*3.14 / 180));
+	m_py = round(m_a1 * sin((float)(m_angle_s0)*3.14 / 180) + m_a2 * sin((float)(teta2)*3.14 / 180));
+	m_px = round(m_px + m_a3 * cos((float)(teta3)*3.14 / 180));
+	m_py = round(m_py + m_a3 * sin((float)(teta3)*3.14 / 180));
+
+	m_orientation = teta3;
 	
 	UpdateData(FALSE);
 }

@@ -57,6 +57,11 @@
 #define IDC_STINTERPOLATION_S1          1050
 #define IDC_BTNCTR_S2                   1051
 #define IDC_BTNCTR_S3                   1052
+#define IDC_STA3                        1053
+#define IDC_ECA3                        1054
+#define IDC_STORIENTATION               1055
+#define IDC_ECPX2                       1056
+#define IDC_ECORIENTATION               1056
 
 // Next default values for new objects
 // 
