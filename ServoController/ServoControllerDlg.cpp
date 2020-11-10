@@ -66,6 +66,12 @@ void CServoControllerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_ECPX, m_px);
 	DDX_Text(pDX, IDC_ECPY, m_py);
 	DDX_Text(pDX, IDC_ECORIENTATION, m_orientation);
+	DDX_Text(pDX, IDC_ECTHETA11, m_satu);
+	DDX_Text(pDX, IDC_ECTHETA21, m_dua);
+	DDX_Text(pDX, IDC_ECTHETA31, m_tiga);
+	DDX_Text(pDX, IDC_ECTHETA12, m_satu2);
+	DDX_Text(pDX, IDC_ECTHETA22, m_dua2);
+	DDX_Text(pDX, IDC_ECTHETA32, m_tiga2);
 	DDX_Control(pDX, IDC_SLANGLE_S0, m_slider0);
 	DDX_Control(pDX, IDC_SLANGLE_S1, m_slider1);
 	DDX_Control(pDX, IDC_SLANGLE_S2, m_slider2);
@@ -74,6 +80,14 @@ void CServoControllerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTNCLOSE, m_closePort);
 	DDX_Control(pDX, IDC_MSCOMM1, m_comm);
 	DDX_Control(pDX, IDC_BTNORGN, m_originPos);
+	DDX_Control(pDX, IDC_BTNCTR_S0, m_center_s0);
+	DDX_Control(pDX, IDC_BTNCTR_S1, m_center_s1);
+	DDX_Control(pDX, IDC_BTNCTR_S2, m_center_s2);
+	DDX_Control(pDX, IDC_BTNCTR_S3, m_center_s3);
+	DDX_Control(pDX, IDC_BTNCALC1, m_calc_inv1);
+	DDX_Control(pDX, IDC_BTNRUN1, m_run_inv1);
+	DDX_Control(pDX, IDC_BTNCALC2, m_calc_inv2);
+	DDX_Control(pDX, IDC_BTNRUN2, m_run_inv2);
 }
 
 BEGIN_MESSAGE_MAP(CServoControllerDlg, CDialogEx)
@@ -86,6 +100,14 @@ BEGIN_MESSAGE_MAP(CServoControllerDlg, CDialogEx)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLANGLE_S1, &CServoControllerDlg::OnNMCustomdrawSliderAngle_S1)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLANGLE_S2, &CServoControllerDlg::OnNMCustomdrawSliderAngle_S2)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLANGLE_S3, &CServoControllerDlg::OnNMCustomdrawSliderAngle_S3)
+	ON_BN_CLICKED(IDC_BTNCTR_S0, &CServoControllerDlg::OnBnClickedBtnCenter_S0)
+	ON_BN_CLICKED(IDC_BTNCTR_S1, &CServoControllerDlg::OnBnClickedBtnCenter_S1)
+	ON_BN_CLICKED(IDC_BTNCTR_S2, &CServoControllerDlg::OnBnClickedBtnCenter_S2)
+	ON_BN_CLICKED(IDC_BTNCTR_S3, &CServoControllerDlg::OnBnClickedBtnCenter_S3)
+	ON_BN_CLICKED(IDC_BTNCALC1, &CServoControllerDlg::OnBnClickedBtnCalcInv1)
+	ON_BN_CLICKED(IDC_BTNCALC2, &CServoControllerDlg::OnBnClickedBtnCalcInv2)
+	ON_BN_CLICKED(IDC_BTNRUN1, &CServoControllerDlg::OnBnClickedBtnRunInv1)
+	ON_BN_CLICKED(IDC_BTNRUN2, &CServoControllerDlg::OnBnClickedBtnRunInv2)
 END_MESSAGE_MAP()
 
 
@@ -121,8 +143,17 @@ BOOL CServoControllerDlg::OnInitDialog()
 	m_slider3.SetPos(0);
 	m_slider3.EnableWindow(FALSE);
 
-	// Close Port Button
+	// Button Setting
 	m_closePort.EnableWindow(FALSE);
+	m_originPos.EnableWindow(FALSE);
+	m_center_s0.EnableWindow(FALSE);
+	m_center_s1.EnableWindow(FALSE);
+	m_center_s2.EnableWindow(FALSE);
+	m_center_s3.EnableWindow(FALSE);
+	m_calc_inv1.EnableWindow(FALSE);
+	m_calc_inv2.EnableWindow(FALSE);
+	m_run_inv1.EnableWindow(FALSE);
+	m_run_inv2.EnableWindow(FALSE);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -180,10 +211,19 @@ void CServoControllerDlg::OnBnClickedBtnOpen()
 	{
 		m_openPort.EnableWindow(FALSE);
 		m_closePort.EnableWindow(TRUE);
+		m_originPos.EnableWindow(TRUE);
 		m_slider0.EnableWindow(TRUE);
 		m_slider1.EnableWindow(TRUE);
 		m_slider2.EnableWindow(TRUE);
 		m_slider3.EnableWindow(TRUE);
+		m_center_s0.EnableWindow(TRUE);
+		m_center_s1.EnableWindow(TRUE);
+		m_center_s2.EnableWindow(TRUE);
+		m_center_s3.EnableWindow(TRUE);
+		m_calc_inv1.EnableWindow(TRUE);
+		m_calc_inv2.EnableWindow(TRUE);
+		m_run_inv1.EnableWindow(TRUE);
+		m_run_inv2.EnableWindow(TRUE);
 	}
 
 	UpdateData(FALSE);
@@ -196,6 +236,15 @@ void CServoControllerDlg::OnBnClickedBtnClose()
 	// Ketika port ditutup, matikan tombol 'Close Port' dan Slider; Nyalakan tombol 'Open Port'
 	m_openPort.EnableWindow(TRUE);
 	m_closePort.EnableWindow(FALSE);
+	m_originPos.EnableWindow(FALSE);
+	m_center_s0.EnableWindow(FALSE);
+	m_center_s1.EnableWindow(FALSE);
+	m_center_s2.EnableWindow(FALSE);
+	m_center_s3.EnableWindow(FALSE);
+	m_calc_inv1.EnableWindow(FALSE);
+	m_calc_inv2.EnableWindow(FALSE);
+	m_run_inv1.EnableWindow(FALSE);
+	m_run_inv2.EnableWindow(FALSE);
 
 	// Servo 0
 	m_angle_s0 = 90;
@@ -219,6 +268,9 @@ void CServoControllerDlg::OnBnClickedBtnClose()
 
 	UpdateData(TRUE);
 	m_port = 0;
+	m_px = 0;
+	m_py = 0;
+	m_orientation = 0;
 	UpdateData(FALSE);
 }
 
@@ -473,10 +525,44 @@ void CServoControllerDlg::OnNMCustomdrawSliderAngle_S3(NMHDR *pNMHDR, LRESULT *p
 		m_comm.put_Output(COleVariant(hexdata));
 		m_comm.put_Output(COleVariant(tail));
 
+		ForwardKinematics();
+
 		UpdateData(FALSE);
 	}
 
 	*pResult = 0;
+}
+
+void CServoControllerDlg::OnBnClickedBtnCenter_S0()
+{
+	UpdateData(TRUE);
+	m_angle_s0 = 90;
+	m_slider0.SetPos(90);
+	UpdateData(FALSE);
+}
+
+void CServoControllerDlg::OnBnClickedBtnCenter_S1()
+{
+	UpdateData(TRUE);
+	m_angle_s1 = 0;
+	m_slider1.SetPos(0);
+	UpdateData(FALSE);
+}
+
+void CServoControllerDlg::OnBnClickedBtnCenter_S2()
+{
+	UpdateData(TRUE);
+	m_angle_s2 = 0;
+	m_slider2.SetPos(0);
+	UpdateData(FALSE);
+}
+
+void CServoControllerDlg::OnBnClickedBtnCenter_S3()
+{
+	UpdateData(TRUE);
+	m_angle_s3 = 0;
+	m_slider3.SetPos(0);
+	UpdateData(FALSE);
 }
 
 void CServoControllerDlg::ForwardKinematics()
@@ -487,8 +573,8 @@ void CServoControllerDlg::ForwardKinematics()
 	UpdateData(TRUE);
 
 	teta2 = m_angle_s0 + m_angle_s2;	// normalisasi
-	m_px = round(m_a1 * cos((float)(m_angle_s0)*3.14 / 180) + m_a2 * cos((float)(teta2)*3.14 / 180));
-	m_py = round(m_a1 * sin((float)(m_angle_s0)*3.14 / 180) + m_a2 * sin((float)(teta2)*3.14 / 180));
+	m_px = round(m_a1 * cos((float)(m_angle_s0) * 3.14 / 180) + m_a2 * cos((float)(teta2) * 3.14 / 180));
+	m_py = round(m_a1 * sin((float)(m_angle_s0) * 3.14 / 180) + m_a2 * sin((float)(teta2) * 3.14 / 180));
 
 	UpdateData(FALSE);*/
 
@@ -500,12 +586,136 @@ void CServoControllerDlg::ForwardKinematics()
 	teta2 = m_angle_s0 + m_angle_s2;	// normalisasi
 	teta3 = teta2 + m_angle_s3;			// normalisasi
 
-	m_px = round(m_a1 * cos((float)(m_angle_s0)*3.14 / 180) + m_a2 * cos((float)(teta2)*3.14 / 180));
-	m_py = round(m_a1 * sin((float)(m_angle_s0)*3.14 / 180) + m_a2 * sin((float)(teta2)*3.14 / 180));
-	m_px = round(m_px + m_a3 * cos((float)(teta3)*3.14 / 180));
-	m_py = round(m_py + m_a3 * sin((float)(teta3)*3.14 / 180));
+	m_px = round(m_a1 * cos((float)(m_angle_s0) * 3.14 / 180) + m_a2 * cos((float)(teta2) * 3.14 / 180));
+	m_py = round(m_a1 * sin((float)(m_angle_s0) * 3.14 / 180) + m_a2 * sin((float)(teta2) * 3.14 / 180));
+	m_px = round(m_px + m_a3 * cos((float)(teta3) * 3.14 / 180));
+	m_py = round(m_py + m_a3 * sin((float)(teta3) * 3.14 / 180));
 
 	m_orientation = teta3;
 	
+	UpdateData(FALSE);
+}
+
+void CServoControllerDlg::InverseKinematics1()
+{
+	float teta1, teta2;
+
+	// Inverse Kinematics 2 DoF
+	/*UpdateData(TRUE);
+
+	teta2 = (pow(m_px, 2) + pow(m_py, 2) - pow((float)m_a1, 2) - pow((float)m_a2, 2)) / (2 * (float)m_a1 * (float)m_a2);
+	if (teta2 >= 1.0) teta2 = 1.0;
+	else if (teta2 <= -1.0) teta2 = -1.0;
+	teta2 = acos(teta2);
+
+	teta1 = ((float)m_a2 * sin(teta2)) / ((float)m_a1 + (float)m_a2 * cos(teta2));
+	teta1 = atan2(m_py, m_px) - atan(teta1);
+
+	m_satu = teta1 * (180 / 3.14);
+	m_dua = teta2 * (180 / 3.14);
+
+	UpdateData(FALSE);*/
+
+	// Inverse kinematics 3 DoF
+	UpdateData(TRUE);
+
+	px = m_px - m_a3 * cos(m_orientation * 3.14 / 180);
+	py = m_py - m_a3 * sin(m_orientation * 3.14 / 180);
+
+	teta2 = (pow(px, 2) + pow(py, 2) - pow(m_a1, 2) - pow(m_a2, 2)) / (2 * m_a1 * m_a2);
+	if (teta2 >= 1.0) teta2 = 1.0;
+	else if (teta2 <= -1.0) teta2 = -1.0;
+	teta2 = acos(teta2);
+
+	teta1 = (m_a2 * sin(teta2)) / (m_a1 + (m_a2 * cos(teta2)));
+	teta1 = atan2(py, px) - atan(teta1);
+
+	m_satu = teta1 * (180 / 3.14);
+	m_dua = teta2 * (180 / 3.14);
+	m_tiga = m_orientation - m_dua - m_satu;
+
+	UpdateData(FALSE);
+}
+
+void CServoControllerDlg::InverseKinematics2()
+{
+	float teta11, teta22;
+
+	// Inverse Kinematics 2 DoF
+	/*UpdateData(TRUE);
+
+	teta22 = (pow(m_px, 2) + pow(m_py, 2) - pow((float)m_a1, 2) - pow((float)m_a2, 2)) / (2 * (float)m_a1 * (float)m_a2);
+	if (teta22 >= 1.0) teta22 = 1.0;
+	else if (teta22 <= -1.0) teta22 = -1.0;
+	teta22 = -acos(teta22);
+
+	teta11 = ((float)m_a2 * sin(teta22)) / ((float)m_a1 + (float)m_a2 * cos(teta22));
+	teta11 = atan2(m_py, m_px) - atan(teta11);
+
+	m_satu2 = teta11 * (180 / 3.14);
+	m_dua2 = teta22 * (180 / 3.14);
+
+	UpdateData(FALSE);*/
+
+	// Inverse kinematics 3 DoF
+	UpdateData(TRUE);
+
+	px = m_px - m_a3 * cos(m_orientation * 3.14 / 180);
+	py = m_py - m_a3 * sin(m_orientation * 3.14 / 180);
+
+	teta22 = (pow(px, 2) + pow(py, 2) - pow(m_a1, 2) - pow(m_a2, 2)) / (2 * m_a1 * m_a2);
+	if (teta22 >= 1.0) teta22 = 1.0;
+	else if (teta22 <= -1.0) teta22 = -1.0;
+	teta22 = -acos(teta22);
+
+	teta11 = (m_a2 * sin(teta22)) / (m_a1 + m_a2 * cos(teta22));
+	teta11 = atan2(py, px) - atan(teta11);
+
+	m_satu2 = teta11 * (180 / 3.14);
+	m_dua2 = teta22 * (180 / 3.14);
+	m_tiga2 = m_orientation - m_dua2 - m_satu2;
+
+	UpdateData(FALSE);
+}
+
+void CServoControllerDlg::OnBnClickedBtnCalcInv1()
+{
+	InverseKinematics1();
+}
+
+void CServoControllerDlg::OnBnClickedBtnCalcInv2()
+{
+	InverseKinematics2();
+}
+
+void CServoControllerDlg::OnBnClickedBtnRunInv1()
+{
+	UpdateData(TRUE);
+
+	// Inverse Kinematics 2 DoF
+	//m_slider0.SetPos(m_satu);
+	//m_slider0.SetPos(m_dua);
+
+	// Inverse Kinematics 3 DoF
+	m_slider0.SetPos(round(m_satu));
+	m_slider2.SetPos(round(m_dua));
+	m_slider3.SetPos(round(m_tiga));
+
+	UpdateData(FALSE);
+}
+
+void CServoControllerDlg::OnBnClickedBtnRunInv2()
+{
+	UpdateData(TRUE);
+
+	// Inverse Kinematics 2 DoF
+	//m_slider0.SetPos(m_satu2);
+	//m_slider0.SetPos(m_dua2);
+
+	// Inverse Kinematics 3 DoF
+	m_slider0.SetPos(round(m_satu2));
+	m_slider2.SetPos(round(m_dua2));
+	m_slider3.SetPos(round(m_tiga2));
+
 	UpdateData(FALSE);
 }

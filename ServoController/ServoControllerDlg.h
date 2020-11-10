@@ -34,9 +34,8 @@ protected:
 public:
 	CMscomm1 m_comm;
 
-	CButton m_openPort;
-	CButton m_closePort;
-	CButton m_originPos;
+	CButton m_openPort, m_closePort, m_originPos;
+	CButton m_center_s0, m_center_s1, m_center_s2, m_center_s3;
 	CSliderCtrl m_slider0, m_slider1, m_slider2, m_slider3;
 
 	int m_port;
@@ -52,9 +51,24 @@ public:
 	afx_msg void OnNMCustomdrawSliderAngle_S1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMCustomdrawSliderAngle_S2(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMCustomdrawSliderAngle_S3(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedBtnCenter_S0();
+	afx_msg void OnBnClickedBtnCenter_S1();
+	afx_msg void OnBnClickedBtnCenter_S2();
+	afx_msg void OnBnClickedBtnCenter_S3();
+
+	CButton m_calc_inv1, m_calc_inv2, m_run_inv1, m_run_inv2;
 
 	int m_a1, m_a2, m_a3;
 	int m_px, m_py, m_orientation;
+	double px, py;
+	double m_satu, m_dua, m_tiga;
+	double m_satu2, m_dua2, m_tiga2;
 
 	afx_msg void ForwardKinematics();
+	afx_msg void InverseKinematics1();
+	afx_msg void InverseKinematics2();
+	afx_msg void OnBnClickedBtnCalcInv1();
+	afx_msg void OnBnClickedBtnCalcInv2();
+	afx_msg void OnBnClickedBtnRunInv1();
+	afx_msg void OnBnClickedBtnRunInv2();
 };
