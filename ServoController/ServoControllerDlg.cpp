@@ -18,6 +18,10 @@ CServoControllerDlg::CServoControllerDlg(CWnd* pParent /*=nullptr*/)
 	, m_y1_s0(593)
 	, m_y2_s0(2396)
 	, m_interpolation_s0(0)
+	, m_angle_s1(0)
+	, m_y1_s1(770)
+	, m_y2_s1(1500)
+	, m_interpolation_s1(0)
 	, m_angle_s2(0)
 	, m_y1_s2(2439)
 	, m_y2_s2(649)
@@ -42,6 +46,10 @@ void CServoControllerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_ECY1_S0, m_y1_s0);
 	DDX_Text(pDX, IDC_ECY2_S0, m_y2_s0);
 	DDX_Text(pDX, IDC_ECINTERPOLATION_S0, m_interpolation_s0);
+	DDX_Text(pDX, IDC_ECANGLE_S1, m_angle_s1);
+	DDX_Text(pDX, IDC_ECY1_S1, m_y1_s1);
+	DDX_Text(pDX, IDC_ECY2_S1, m_y2_s1);
+	DDX_Text(pDX, IDC_ECINTERPOLATION_S1, m_interpolation_s1);
 	DDX_Text(pDX, IDC_ECANGLE_S2, m_angle_s2);
 	DDX_Text(pDX, IDC_ECY1_S2, m_y1_s2);
 	DDX_Text(pDX, IDC_ECY2_S2, m_y2_s2);
@@ -55,6 +63,7 @@ void CServoControllerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_ECPX, m_px);
 	DDX_Text(pDX, IDC_ECPY, m_py);
 	DDX_Control(pDX, IDC_SLANGLE_S0, m_slider0);
+	DDX_Control(pDX, IDC_SLANGLE_S1, m_slider1);
 	DDX_Control(pDX, IDC_SLANGLE_S2, m_slider2);
 	DDX_Control(pDX, IDC_SLANGLE_S3, m_slider3);
 	DDX_Control(pDX, IDC_BTNOPEN, m_openPort);
@@ -70,6 +79,7 @@ BEGIN_MESSAGE_MAP(CServoControllerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTNCLOSE, &CServoControllerDlg::OnBnClickedBtnClose)
 	ON_BN_CLICKED(IDC_BTNORGN, &CServoControllerDlg::OnBnClickedBtnOrigin)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLANGLE_S0, &CServoControllerDlg::OnNMCustomdrawSliderAngle_S0)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLANGLE_S1, &CServoControllerDlg::OnNMCustomdrawSliderAngle_S1)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLANGLE_S2, &CServoControllerDlg::OnNMCustomdrawSliderAngle_S2)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLANGLE_S3, &CServoControllerDlg::OnNMCustomdrawSliderAngle_S3)
 END_MESSAGE_MAP()
@@ -91,6 +101,11 @@ BOOL CServoControllerDlg::OnInitDialog()
 	m_slider0.SetRange(0, 180, 1);
 	m_slider0.SetPos(90);
 	m_slider0.EnableWindow(FALSE);
+
+	// Servo 1
+	m_slider1.SetRange(0, 90, 1);
+	m_slider1.SetPos(0);
+	m_slider1.EnableWindow(FALSE);
 
 	// Servo 2
 	m_slider2.SetRange(-90, 90, 1);
@@ -162,6 +177,7 @@ void CServoControllerDlg::OnBnClickedBtnOpen()
 		m_openPort.EnableWindow(FALSE);
 		m_closePort.EnableWindow(TRUE);
 		m_slider0.EnableWindow(TRUE);
+		m_slider1.EnableWindow(TRUE);
 		m_slider2.EnableWindow(TRUE);
 		m_slider3.EnableWindow(TRUE);
 	}
@@ -181,6 +197,11 @@ void CServoControllerDlg::OnBnClickedBtnClose()
 	m_angle_s0 = 90;
 	m_slider0.SetPos(90);
 	m_slider0.EnableWindow(FALSE);
+
+	// Servo 1
+	m_angle_s1 = 0;
+	m_slider1.SetPos(0);
+	m_slider1.EnableWindow(FALSE);
 
 	// Servo 2
 	m_angle_s2 = 0;
@@ -205,11 +226,15 @@ void CServoControllerDlg::OnBnClickedBtnOrigin()
 	m_angle_s0 = 90;
 	m_slider0.SetPos(90);
 
+	// Servo 1
+	m_angle_s1 = 0;
+	m_slider1.SetPos(0);
+
 	// Servo 2
 	m_angle_s2 = 0;
 	m_slider2.SetPos(0);
 
-	// Servo 2
+	// Servo 3
 	m_angle_s3 = 0;
 	m_slider3.SetPos(0);
 
@@ -260,6 +285,65 @@ void CServoControllerDlg::OnNMCustomdrawSliderAngle_S0(NMHDR *pNMHDR, LRESULT *p
 	tail[2] = 0x00;
 
 	if (m_comm.get_PortOpen()) 
+	{
+		UpdateData(TRUE);
+
+		m_comm.put_Output(COleVariant(header));
+		m_comm.put_Output(COleVariant(hexdata));
+		m_comm.put_Output(COleVariant(tail));
+
+		ForwardKinematics();
+
+		UpdateData(FALSE);
+	}
+
+	*pResult = 0;
+}
+
+void CServoControllerDlg::OnNMCustomdrawSliderAngle_S1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+
+	UpdateData(TRUE);
+
+	m_angle_s1 = m_slider1.GetPos();
+	y_s1 = m_y1_s1 + (m_y2_s1 - m_y1_s1) * (m_angle_s1 - 0) / (90 - 0);
+	m_interpolation_s1 = y_s1;
+
+	UpdateData(FALSE);
+
+	CByteArray hexdata; hexdata.SetSize(19);
+	CByteArray header; header.SetSize(2);
+	CByteArray tail; tail.SetSize(3);
+
+	header[0] = 0x0D;
+	header[1] = 0x0A;
+
+	hexdata[0] = '#';
+	hexdata[1] = '1';
+	hexdata[2] = ' ';
+	hexdata[3] = 'P';
+	hexdata[4] = 0x30 + ((y_s1 / 1000) % 10);
+	hexdata[5] = 0x30 + ((y_s1 / 100) % 10);
+	hexdata[6] = 0x30 + ((y_s1 / 10) % 10);
+	hexdata[7] = 0x30 + (y_s1 % 10);
+	hexdata[8] = ' ';
+	hexdata[9] = 'S';
+	hexdata[10] = '1';
+	hexdata[11] = '0';
+	hexdata[12] = '0';
+	hexdata[13] = '0';
+	hexdata[14] = ' ';
+	hexdata[15] = '<';
+	hexdata[16] = 'c';
+	hexdata[17] = 'r';
+	hexdata[18] = '>';
+
+	tail[0] = 0x0D;
+	tail[1] = 0x0A;
+	tail[2] = 0x00;
+
+	if (m_comm.get_PortOpen())
 	{
 		UpdateData(TRUE);
 
@@ -397,7 +481,7 @@ void CServoControllerDlg::ForwardKinematics()
 
 	UpdateData(TRUE);
 
-	teta2 = m_angle_s0 + (m_angle_s2 - 90); // normalisasi
+	teta2 = m_angle_s1 + (m_angle_s2 - 90); // normalisasi
 	m_px = round(m_a1 * cos((float)(m_angle_s0)*3.14 / 180) + m_a2 * cos((float)(teta2)*3.14 / 180));
 	m_py = round(m_a1 * sin((float)(m_angle_s0)*3.14 / 180) + m_a2 * sin((float)(teta2)*3.14 / 180));
 	

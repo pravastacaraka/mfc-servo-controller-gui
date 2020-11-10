@@ -37,10 +37,11 @@ public:
 	CButton m_openPort;
 	CButton m_closePort;
 	CButton m_originPos;
-	CSliderCtrl m_slider0, m_slider2, m_slider3;
+	CSliderCtrl m_slider0, m_slider1, m_slider2, m_slider3;
 
 	int m_port;
 	int y_s0, m_angle_s0, m_y1_s0, m_y2_s0, m_interpolation_s0;
+	int y_s1, m_angle_s1, m_y1_s1, m_y2_s1, m_interpolation_s1;
 	int y_s2, m_angle_s2, m_y1_s2, m_y2_s2, m_interpolation_s2;
 	int y_s3, m_angle_s3, m_y1_s3, m_y2_s3, m_interpolation_s3;
 
@@ -48,6 +49,7 @@ public:
 	afx_msg void OnBnClickedBtnClose();
 	afx_msg void OnBnClickedBtnOrigin();
 	afx_msg void OnNMCustomdrawSliderAngle_S0(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMCustomdrawSliderAngle_S1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMCustomdrawSliderAngle_S2(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMCustomdrawSliderAngle_S3(NMHDR *pNMHDR, LRESULT *pResult);
 

@@ -43,8 +43,20 @@
 #define IDC_STPX                        1036
 #define IDC_STPY                        1037
 #define IDC_ECPX                        1038
-#define IDC_ECPX2                       1039
 #define IDC_ECPY                        1039
+#define IDC_BTNCTR_S0                   1040
+#define IDC_SLANGLE_S1                  1041
+#define IDC_ECANGLE_S1                  1042
+#define IDC_ECY1_S1                     1043
+#define IDC_ECY2_S1                     1044
+#define IDC_ECINTERPOLATION_S1          1045
+#define IDC_BTNCTR_S1                   1046
+#define IDC_STANGLE_S1                  1047
+#define IDC_STY1_S1                     1048
+#define IDC_STY2_S1                     1049
+#define IDC_STINTERPOLATION_S1          1050
+#define IDC_BTNCTR_S2                   1051
+#define IDC_BTNCTR_S3                   1052
 
 // Next default values for new objects
 // 
