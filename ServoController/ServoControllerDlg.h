@@ -59,7 +59,7 @@ public:
 	CButton m_calc_inv1, m_calc_inv2, m_run_inv1, m_run_inv2;
 
 	int m_a1, m_a2, m_a3;
-	int m_px, m_py, m_orientation;
+	float m_px, m_py, m_orientation;
 	double px, py;
 	double m_satu, m_dua, m_tiga;
 	double m_satu2, m_dua2, m_tiga2;
